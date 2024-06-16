@@ -1,38 +1,38 @@
 pipeline {
     agent any
-    environment {
-        SCANNER_HOME = tool 'sonar-scanner'
-    }
+
     stages {
-        stage('clean workspace') {
+        stage('Checkout') {
             steps {
-                cleanWs()
+                // Checkout the source code from Git repository
+                git 'https://github.com/surics47/DevSecOps-NetflixProject.git'
             }
         }
-        stage('Checkout from Git') {
+        
+        stage('Build') {
             steps {
-                git branch: 'main', url: 'https://github.com/N4si/DevSecOps-Project.git'
+                // Install dependencies and build your project
+                sh 'npm install'  // Replace with your package manager command if different
+                sh 'npm run build'  // Replace with your build command
             }
         }
-        stage("Sonarqube Analysis") {
+        
+        stage('Test') {
             steps {
-                withSonarQubeEnv('sonar-server') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=Netflix \
-                    -Dsonar.projectKey=Netflix'''
-                }
+                // Run tests (if applicable)
+                sh 'npm test'  // Replace with your test command
             }
         }
-        stage("quality gate") {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'
-                }
-            }
+    }
+    
+    post {
+        success {
+            echo 'CI/CD pipeline completed successfully!'
+            // Additional success post-build actions if needed
         }
-        stage('Install Dependencies') {
-            steps {
-                sh "npm install"
-            }
+        failure {
+            echo 'CI/CD pipeline failed!'
+            // Additional failure post-build actions if needed
         }
     }
 }
