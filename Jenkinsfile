@@ -21,6 +21,13 @@ pipeline {
                 sh 'npm test'  // Example command to run tests
             }
         }
+        
+        stage('Deploy') {
+            steps {
+                sh 'kubectl apply -f Kubernetes/deployment.yaml'  // Example deployment to Kubernetes
+                // Add more deployment steps as needed
+            }
+        }
     }
     
     post {
@@ -34,4 +41,3 @@ pipeline {
         }
     }
 }
-
